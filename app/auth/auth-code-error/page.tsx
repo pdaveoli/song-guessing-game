@@ -1,12 +1,12 @@
 "use client";
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
-export default function AuthCodeError() {
+function AuthCodeErrorContent() {
     const searchParams = useSearchParams();
     const [error, setError] = useState<string>('');
     const [errorDescription, setErrorDescription] = useState<string>('');
@@ -149,5 +149,29 @@ export default function AuthCodeError() {
                 </Card>
             </div>
         </div>
+    );
+}
+
+// Loading fallback component
+function AuthCodeErrorFallback() {
+    return (
+        <div className="min-h-screen w-full flex items-center justify-center p-6 md:p-10 bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+            <div className="w-full max-w-lg">
+                <Card className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-slate-200 dark:border-slate-700">
+                    <CardContent className="text-center py-12">
+                        <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                        <p className="text-lg text-slate-600 dark:text-slate-400">Loading...</p>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    );
+}
+
+export default function AuthCodeError() {
+    return (
+        <Suspense fallback={<AuthCodeErrorFallback />}>
+            <AuthCodeErrorContent />
+        </Suspense>
     );
 }
