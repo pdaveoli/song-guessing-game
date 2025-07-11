@@ -15,6 +15,9 @@ export interface SpotifyExternalIds {
 }
 
 export interface SpotifyArtist {
+  images: any;
+  genres: any;
+  followers: any;
   external_urls: SpotifyExternalUrls;
   href: string;
   id: string;

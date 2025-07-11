@@ -17,6 +17,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Music } from "lucide-react";
 
+const spotifyScopes = [
+  'user-read-private',
+  'user-read-email',
+  'user-library-read',
+  'user-top-read',        // This is what you need for top tracks
+  'user-read-recently-played'  // Optional: for recently played tracks
+];
+
 export function LoginForm({
   className,
   ...props
@@ -51,7 +59,7 @@ export function LoginForm({
         provider: 'spotify',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          scopes: 'user-library-read user-read-email user-read-private'
+          scopes: spotifyScopes.join(' '),
         },
       });
       

@@ -192,6 +192,10 @@ export default function SongGuesser({ trackName, artistName, difficulty = 'easy'
         }
         setHideAnswer(false);
         setIsPlaying(false);
+        if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
         if (onGuessWrong) onGuessWrong();
       }
     }
@@ -208,13 +212,29 @@ export default function SongGuesser({ trackName, artistName, difficulty = 'easy'
     }
   }
 
+  const giveUp = () => {
+    if (!trackData) return;
+    // set guesses remaining to 0
+    setGuessesRemaining(0);
+    setError(`Wrong guess! The correct answer was "${trackData.title}" by ${trackData.artist}`);
+    setHideAnswer(false);
+    setIsPlaying(false);
+    // stop playing
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    if (onGuessWrong) onGuessWrong();
+
+  }
+
 
   if (loading) {
     return (
       <div className=" w-full items-center justify-center border rounded-lg p-6 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950 border-purple-200 dark:border-purple-800 h-full ">
-                        <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-                        <p className="text-sm ml-4">Loading....</p>
-                    </div>
+        <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+        <p className="text-sm ml-4">Loading....</p>
+      </div>
     );
   }
 
@@ -256,7 +276,7 @@ export default function SongGuesser({ trackName, artistName, difficulty = 'easy'
         preload="metadata"
         onEnded={stopPlayback}
       />
-      
+
       {hideAnswer ? (
         <div className="flex items-center gap-3 mb-4">
           <Button
@@ -336,9 +356,14 @@ export default function SongGuesser({ trackName, artistName, difficulty = 'easy'
                 className="w-full mb-2"
                 name='guess'
                 required />
+                <div className="flex items-center justify-center gap-2 mb-2">
               <Button type='submit' className="bg-purple-600 hover:bg-purple-700 text-white">
                 Submit Guess
               </Button>
+              <Button type='button' variant="outline" className="border-purple-300 hover:bg-purple-100 dark:border-purple-700 dark:hover:bg-purple-900" onClick={() => giveUp()}>
+                Give up
+              </Button>
+              </div>
             </form>
           </div>
         )}
