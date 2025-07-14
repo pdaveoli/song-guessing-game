@@ -82,9 +82,8 @@ export const convertToGameTracks = (spotifyTracks: SpotifyTrack[]): GameTrack[] 
   }));
 }
 
-export const getRandomSavedTrack = async (accessToken: string): Promise<SpotifyTrack> => {
+export const getRandomSavedTrack = async (accessToken: string, tracksDone? : SpotifyTrack[]): Promise<SpotifyTrack> => {
   console.log('Fetching random saved track...');
-
   try {
     // First, get total count of saved tracks
     const countResponse = await fetch("https://api.spotify.com/v1/me/tracks?limit=1", {
@@ -99,14 +98,26 @@ export const getRandomSavedTrack = async (accessToken: string): Promise<SpotifyT
     }
 
     const countData: SpotifyUserTracksResponse = await countResponse.json();
-    const totalTracks = countData.total;
+    
 
-    if (totalTracks === 0) {
+    if (countData.items.length === 0) {
       throw new Error("No saved tracks found");
     }
 
-    console.log(`Found ${totalTracks} total saved tracks`);
+  
 
+    if (tracksDone && tracksDone.length > 0) {
+      // Filter out already played tracks
+      const filteredTracks = countData.items.filter(item => 
+        !tracksDone.some(doneTrack => doneTrack.id === item.track.id)
+      );
+      if (filteredTracks.length === 0) {
+        throw new Error("No available tracks left to play");
+      }
+      console.log(`Filtered down to ${filteredTracks.length} available tracks after removing already played`);
+    }
+    const totalTracks = countData.total;
+    console.log(`Found ${totalTracks} total saved tracks`);
     // Generate random offset
     const randomOffset = Math.floor(Math.random() * totalTracks);
 
@@ -538,7 +549,7 @@ export const getRandomSongByArtist = async (artistSongs: SpotifyTrack[], already
                       !lowerName.includes('live') &&
                       !lowerName.includes('demo') &&
                       !lowerName.includes('instrumental') &&
-                      !lowerName.includes('karaoke');
+                      !lowerName.includes('karaoke') &&
                       !lowerName.includes('(slowed');
     
     if (!isFiltered) {

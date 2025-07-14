@@ -17,7 +17,7 @@ export default function ClassicModePage() {
     const [started, setStarted] = useState(false);
     const [track, setTrack] = useState<SpotifyTrack | null>(null);
     const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
-
+    const [tracksDone, setTracksDone] = useState<SpotifyTrack[]>([]);
     // Enhanced stats
     const [questionsAnswered, setQuestionsAnswered] = useState(0);
     const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -74,8 +74,9 @@ export default function ClassicModePage() {
         setStarted(true);
         console.log("Starting classic game with access token:", accessToken);
         try {
-            const randomTrack = await getRandomSavedTrack(accessToken);
+            const randomTrack = await getRandomSavedTrack(accessToken, tracksDone);
             setTrack(randomTrack);
+            setTracksDone(prev => [...prev, randomTrack]);
         } catch (error) {
             console.error("Error fetching random track:", error);
             setTrack(null);
@@ -87,8 +88,9 @@ export default function ClassicModePage() {
         setTrack(null);
         isLoading(true);
         try {
-            const randomTrack = await getRandomSavedTrack(accessToken!);
+            const randomTrack = await getRandomSavedTrack(accessToken!, tracksDone);
             setTrack(randomTrack);
+            setTracksDone(prev => [...prev, randomTrack]);
         } catch (error) {
             console.error("Error fetching random track:", error);
             setTrack(null);
