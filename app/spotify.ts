@@ -550,7 +550,9 @@ export const getRandomSongByArtist = async (artistSongs: SpotifyTrack[], already
                       !lowerName.includes('demo') &&
                       !lowerName.includes('instrumental') &&
                       !lowerName.includes('karaoke') &&
-                      !lowerName.includes('(slowed');
+                      !lowerName.includes('slowed') &&
+                      !lowerName.includes('reverb');
+                      
     
     if (!isFiltered) {
       console.log(`Filtered out: ${song.name} (contains unwanted keywords)`);
